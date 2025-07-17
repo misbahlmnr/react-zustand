@@ -1,4 +1,4 @@
-import useStore from "@/services/state/store";
+import useStore from "@/services/state/countStore";
 
 const Counter = () => {
   const { count, increment, decrement } = useStore();
