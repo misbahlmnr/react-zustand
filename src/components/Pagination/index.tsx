@@ -1,39 +1,102 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { useCallback } from "react";
 
 type Props = {
   handleNextPage: () => void;
   handlePrevPage: () => void;
+  handleGotoPage: (page: number) => void;
   skip: number;
   limit: number;
   total: number;
 };
 
-const Pagination = ({
+const PaginationComponent = ({
   handleNextPage,
   handlePrevPage,
+  handleGotoPage,
   skip,
   limit,
   total,
 }: Props) => {
+  const currentPage = Math.floor(skip / limit) + 1;
+  const totalPage = Math.ceil(total / limit);
+
+  const getPageToShow = useCallback(() => {
+    const pages: (number | string)[] = [];
+
+    if (totalPage <= 5) {
+      for (let i = 1; i <= totalPage; i++) pages.push(i);
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, "...", totalPage);
+      } else if (currentPage >= totalPage - 2) {
+        pages.push(1, "...", totalPage - 2, totalPage - 1, totalPage);
+      } else {
+        pages.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPage
+        );
+      }
+    }
+
+    return pages;
+  }, [currentPage, totalPage]);
+
   return (
-    <div className="flex justify-center items-center gap-3">
-      <button
-        onClick={handlePrevPage}
-        disabled={skip === 0}
-        className="p-2 bg-gray-950 hover:cursor-pointer rounded-lg disabled:cursor-not-allowed disabled:bg-gray-800"
-      >
-        <ChevronLeft />
-      </button>
-      <span>Page {Math.floor(skip / limit) + 1}</span>
-      <button
-        onClick={handleNextPage}
-        disabled={skip + limit >= total}
-        className="p-2 bg-gray-950 rounded-lg hover:cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-800"
-      >
-        <ChevronRight />
-      </button>
-    </div>
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              handlePrevPage();
+            }}
+          />
+        </PaginationItem>
+        {getPageToShow().map((page, idx) => (
+          <PaginationItem key={idx}>
+            {page === "..." ? (
+              <PaginationEllipsis />
+            ) : (
+              <PaginationLink
+                href="#"
+                isActive={page === currentPage}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleGotoPage(page as number);
+                }}
+              >
+                {page}
+              </PaginationLink>
+            )}
+          </PaginationItem>
+        ))}
+        <PaginationItem>
+          <PaginationNext
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNextPage();
+            }}
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
   );
 };
 
-export default Pagination;
+export default PaginationComponent;

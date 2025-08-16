@@ -1,4 +1,13 @@
-import { useNavigate, useSearchParams } from "react-router";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { isEmpty } from "@/lib/helpers";
+import { formatDate, getFullName } from "@/lib/utils";
 
 type Props = {
   data: any;
@@ -6,37 +15,47 @@ type Props = {
   setSearch: (search: string) => void;
 };
 
-const ListData = ({ data, loading, setSearch }: Props) => {
-  const navigate = useNavigate();
-  const [_, setSearchParams] = useSearchParams();
-
-  const handleBackToHome = () => {
-    setSearchParams({});
-    setSearch("");
-    navigate("/");
-  };
-
+const ListData = ({ data, loading }: Props) => {
   return (
-    <div className="flex flex-col items-center justify-center max-w-md w-full gap-4 mx-auto bg-gray-950 p-4 flex-1 overflow-auto rounded-lg pt-10">
-      {loading ? (
-        <p>Loading...</p>
-      ) : data.length > 0 ? (
-        data.map((user: any) => (
-          <div key={user.id} className=" bg-gray-800 w-full p-4 rounded-lg">
-            <h1 className="text-center">{user.firstName}</h1>
-          </div>
-        ))
-      ) : (
-        <>
-          <p>No users found</p>
-          <button
-            onClick={handleBackToHome}
-            className="p-2 bg-blue-500 text-white rounded-lg cursor-pointer"
-          >
-            Back to home
-          </button>
-        </>
-      )}
+    <div className="relative w-full overflow-y-auto">
+      <Table>
+        <TableHeader className="uppercase">
+          <TableRow>
+            <TableHead className="sticky left-0 z-10 min-w-[50px] bg-white">
+              No
+            </TableHead>
+            <TableHead className="sticky left-[50px] z-10 bg-white">
+              Name
+            </TableHead>
+            <TableHead>Number Phone</TableHead>
+            <TableHead>Date of Bird</TableHead>
+            <TableHead>Address</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {!isEmpty(data) ? (
+            data.map((user: any) => (
+              <TableRow key={user.id}>
+                <TableCell className="sticky left-0 z-10 min-w-[50px] bg-white">
+                  {user.id}
+                </TableCell>
+                <TableCell className="sticky left-[50px] z-10 bg-white">
+                  {getFullName(user.firstName, user.lastName)}
+                </TableCell>
+                <TableCell>{user.phone}</TableCell>
+                <TableCell>{formatDate(user.birthDate)}</TableCell>
+                <TableCell>{user.address.city}</TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center">
+                {loading ? "Loading..." : "No data found"}
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 };

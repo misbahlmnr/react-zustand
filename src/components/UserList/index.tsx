@@ -24,6 +24,11 @@ function UserList() {
     if (skip - limit >= 0) setSkip(skip - limit);
   };
 
+  const handleGotoPage = (page: number) => {
+    console.log(page - 1);
+    setSkip((page - 1) * limit);
+  };
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -33,12 +38,15 @@ function UserList() {
   };
 
   return (
-    <div className="flex flex-col w-full h-screen p-10 gap-5">
+    <div className="flex flex-col max-w-4xl mx-auto h-screen p-10 gap-5 md:gap-10">
       <SearchForm search={search} setSearch={setSearch} onSubmit={onSubmit} />
-      <ListData data={users} loading={loading} setSearch={setSearch} />
+      <div className="flex-1 flex-grow overflow-auto bg-white shadow-md p-4">
+        <ListData data={users} loading={loading} setSearch={setSearch} />
+      </div>
       <Pagination
         handleNextPage={handleNextPage}
         handlePrevPage={handlePrevPage}
+        handleGotoPage={handleGotoPage}
         skip={skip}
         limit={limit}
         total={total}
